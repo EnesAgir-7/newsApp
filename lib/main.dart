@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/models/article.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'data/news_services.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,22 +16,34 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MyHomePage(title: 'News'),
+      home: MyHomePage(title: 'News'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
+  MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<Articles> articles = [];
+
+  @override
+  void initState() {
+    NewsService.getNews().then((value) {
+      setState(() {
+        articles = value;
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,32 +51,38 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: Center(child: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (context, index) {
-        return Card(
-          child: Column(
-            children: [
-              Image.network('https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2019.svg/800px-BBC_News_2019.svg.png'),
-              ListTile(
-                leading: Icon(Icons.arrow_drop_down_circle),
-                title: Text('News Header'),
-                subtitle: Text('author'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text('description description description  description description description  description description description description description'),
-              ),
-              ButtonBar(
-                alignment: MainAxisAlignment.start,
-                children: [
-                  FlatButton(onPressed: (){}, child: Text('go news')),
-                ],
-              )
-            ],
-          ),
-        );
-      }))
+      body: Center(
+          child: ListView.builder(
+              itemCount: articles.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: Column(
+                    children: [
+                      Image.network(articles[index].urlToImage ??
+                          'https://i0.wp.com/designermenus.com.au/wp-content/uploads/2016/02/icon-None.png?w=300&ssl=1'),
+                      ListTile(
+                        leading: Icon(Icons.arrow_drop_down_circle),
+                        title: Text(articles[index].title ?? ''),
+                        subtitle: Text(articles[index].author ?? ''),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(articles[index].description ?? ''),
+                      ),
+                      ButtonBar(
+                        alignment: MainAxisAlignment.start,
+                        children: [
+                          MaterialButton(
+                              onPressed: () async {
+                                await launch(articles[index].url ?? '');
+                              },
+                              child: Text('Habere Git')),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              })),
     );
   }
 }
