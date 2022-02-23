@@ -44,7 +44,22 @@ class _MyHomePageState extends State<MyHomePage> {
         return Card(
           child: Column(
             children: [
-              Image.network("")
+              Image.network('https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2019.svg/800px-BBC_News_2019.svg.png'),
+              ListTile(
+                leading: Icon(Icons.arrow_drop_down_circle),
+                title: Text('News Header'),
+                subtitle: Text('author'),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('description description description  description description description  description description description description description'),
+              ),
+              ButtonBar(
+                alignment: MainAxisAlignment.start,
+                children: [
+                  FlatButton(onPressed: (){}, child: Text('go news')),
+                ],
+              )
             ],
           ),
         );
